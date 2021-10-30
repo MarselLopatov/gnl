@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: marsel <marsel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/13 12:46:11 by cdoria            #+#    #+#             */
-/*   Updated: 2021/10/30 13:58:25 by marsel           ###   ########.fr       */
+/*   Updated: 2021/10/30 13:56:37 by marsel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,7 +146,7 @@ char	*get_next_line(int fd)
 		return (line);
 	line = get_line(&temp->cache, &buf, &line, temp->fd);
 	return (line);
-}	
+}
 
 // #include <fcntl.h>
 // #include <stdio.h>
