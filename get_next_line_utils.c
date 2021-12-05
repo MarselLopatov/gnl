@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line_utils.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marsel <marsel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: cdoria <cdoria@student.21-school.ru>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/10/13 12:46:41 by cdoria            #+#    #+#             */
-/*   Updated: 2021/10/30 13:21:52 by marsel           ###   ########.fr       */
+/*   Created: 2021/11/29 19:28:53 by coleta            #+#    #+#             */
+/*   Updated: 2021/12/05 17:23:03 by cdoria           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char	*ft_strdup(const char *s) // использовать для строки
+char	*ft_strdup(const char *s)
 {
 	char	*str;
 	int		i;
@@ -48,9 +48,9 @@ char	*ft_strchr(const char *s, int c)
 	return (NULL);
 }
 
-size_t	ft_strlen(const char *s)
+int	ft_strlen(const char *s)
 {
-	size_t	i;
+	int	i;
 
 	i = 0;
 	while (s && s[i] != 0)
@@ -58,31 +58,10 @@ size_t	ft_strlen(const char *s)
 	return (i);
 }
 
-char	*ft_save_cache(char *point_n)
-{
-	char	*str;
-	int		i;
-
-	if (!*point_n)
-		return (NULL);
-	str = malloc (sizeof(char) * (ft_strlen(point_n) + 1));
-	if (!str)
-		return (NULL);
-	i = 0;
-	while (point_n[i])
-	{
-		str[i] = point_n[i];
-		i++;
-	}
-	str[i] = '\0';
-	return (str);
-}
-
-char	*ft_strjoin(char *s1, char *s2) // использовать для строки
+char	*ft_strjoin(char *s1, char *s2)
 {
 	char	*join;
 	int		len1;
-	int		i;
 
 	if (!s1 || !s2)
 		return (NULL);
@@ -90,8 +69,16 @@ char	*ft_strjoin(char *s1, char *s2) // использовать для стро
 	join = (char *)malloc (sizeof(char) * (len1 + ft_strlen(s2) + 1));
 	if (!join)
 		return (NULL);
+	join = ft_strlcat(s1, s2, len1, join);
+	free (s1);
+	return (join);
+}
+
+char	*ft_strlcat(char *s1, char *s2, int len1, char *join)
+{
+	int		i;
+
 	i = 0;
-	//join[len1 + len2] = '\n';
 	while (s1 && s1[i])
 	{
 		join[i] = s1[i];
@@ -109,7 +96,5 @@ char	*ft_strjoin(char *s1, char *s2) // использовать для стро
 		i++;
 	}
 	join[len1 + i] = '\0';
-	//ft_strlcat(join, s2, ft_strlen(s1) + ft_strlen(s2) + 1);
-	free (s1);
 	return (join);
 }

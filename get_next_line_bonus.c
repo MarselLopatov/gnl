@@ -3,16 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marsel <marsel@student.42.fr>              +#+  +:+       +#+        */
+/*   By: cdoria <cdoria@student.21-school.ru>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/13 12:46:11 by cdoria            #+#    #+#             */
-/*   Updated: 2021/10/30 13:56:37 by marsel           ###   ########.fr       */
+/*   Updated: 2021/12/05 17:32:02 by cdoria           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
-
-#include <stdio.h>	// удалить
+#include "get_next_line_bonus.h"
 
 char	*ft_clear(char **cache, char **buf, char **line, int kostil)
 {
@@ -28,22 +26,27 @@ char	*ft_clear(char **cache, char **buf, char **line, int kostil)
 		free (*cache);
 		*cache = NULL;
 	}
-	// if (*line == NULL && kostil == 1)// я фришу каждый раз head  и он никогда не станет NULL
-	// 	free (head);
 	return (*line);
 }
 
-t_list	*ft_newlist(int fd)
+char	*ft_save_cache(char *point_n)
 {
-	t_list	*new;
+	char	*str;
+	int		i;
 
-	new = (t_list *) malloc (sizeof(t_list));
-	if (!new)
+	if (!*point_n)
 		return (NULL);
-	new->fd = fd;
-	new->cache = NULL;
-	new->next = NULL;
-	return (new);
+	str = malloc (sizeof(char) * (ft_strlen(point_n) + 1));
+	if (!str)
+		return (NULL);
+	i = 0;
+	while (point_n[i])
+	{
+		str[i] = point_n[i];
+		i++;
+	}
+	str[i] = '\0';
+	return (str);
 }
 
 int	check_cache(char **cache, char **line, char **buf)
@@ -55,18 +58,10 @@ int	check_cache(char **cache, char **line, char **buf)
 		point_n = ft_strchr(*cache, '\n');
 		if (point_n)
 		{
-			//*point_n = '\0';
 			*line = ft_strdup(*cache);
 			point_n = ft_save_cache(++point_n);
-
-		//head->cache = ft_save_cache(++point_n);
-			
 			ft_clear(cache, buf, line, 0);
 			*cache = point_n;
-			//point_n = ft_strjoin (head->cache, ++point_n); // тут же я приклеиваю 2 строки
-			//ft_clear(head, buf, line, 0);
-			//head->cache = point_n;
-			//free (*buf);
 			return (1);
 		}
 		else
@@ -77,11 +72,8 @@ int	check_cache(char **cache, char **line, char **buf)
 			return (0);
 		}
 	}
-	else
-	{
-		*line = malloc(1);
-		**line = 0;
-	}
+	*line = malloc(1);
+	**line = 0;
 	return (0);
 }
 
@@ -89,91 +81,41 @@ char	*get_line(char **cache, char **buf, char **line, int fd)
 {
 	int		rd;
 	char	*point_n;
-	//char	*tmp;
 
 	while (1)
 	{
 		rd = read (fd, *buf, BUFFER_SIZE);
 		if (rd <= 0 && *cache == NULL)
-			return (ft_clear(cache, buf, line, 1)); // нужно разобраться
+			return (ft_clear(cache, buf, line, 1));
 		(*buf)[rd] = '\0';
 		point_n = ft_strchr(*buf, '\n');
 		if (point_n)
 		{
-			*line = ft_strjoin (*line, *buf); // мб з десь утечка при фришке
+			*line = ft_strjoin (*line, *buf);
 			point_n = ft_save_cache(++point_n);
-
 			ft_clear(cache, buf, line, 0);
-		// функцию которая запоминает весь кэш
-
 			*cache = point_n;
-		//head->cache = ft_save_cache(++point_n);
-			//head->cache = ft_strdup (++point_n); // strdup ??????????????????????
-			//ft_strcpy (head->cache, ++point_n);
-		//free (*buf);				// мб так же здесь
 			return (*line);
 		}
 		else
 			*line = ft_strjoin (*line, *buf);
 	}
-	return (*line); // мб возвращать 0
+	return (NULL);
 }
 
 char	*get_next_line(int fd)
 {
-	static t_list	*head;
-	t_list			*temp;
-	char			*line;
-	char			*buf;
+	static char	*cache[OPEN_MAX];
+	char		*line;
+	char		*buf;
 
-	if (fd < 0 || BUFFER_SIZE <= 0)
+	if (fd < 0 || BUFFER_SIZE <= 0 || fd > OPEN_MAX)
 		return (NULL);
 	buf = malloc (sizeof(char) * (BUFFER_SIZE + 1));
 	if (!buf)
 		return (NULL);
-	if (!head)
-		head = ft_newlist(fd);
-	temp = head;
-	while (temp->next && temp->fd != fd)
-		temp = temp->next;
-	if (temp->fd != fd)
-	{
-		temp->next = ft_newlist(fd);
-		temp = temp->next;
-	}
-	// проверка на кеш	УБЕРИ КОМЕНТЫ ГНИДА 
-	if (check_cache(&temp->cache, &line, &buf))
+	if (check_cache(&cache[fd], &line, &buf))
 		return (line);
-	line = get_line(&temp->cache, &buf, &line, temp->fd);
+	line = get_line(&cache[fd], &buf, &line, fd);
 	return (line);
 }
-
-// #include <fcntl.h>
-// #include <stdio.h>
-// int main()
-// {
-// 	int		fd;
-// 	int		fd1;
-// 	char	*line;
-// 	char	*line1;
-
-// 	fd = open("test", O_RDONLY);
-// 	fd1 = open("test1", O_RDONLY);
-// 	line = get_next_line(fd);
-// 	printf("0: %s", line);
-// 	line = get_next_line(fd);
-// 	printf("0: %s", line);
-// 	line1 = get_next_line(fd1);
-// 	printf("1: %s", line1);
-// 	line = get_next_line(fd);
-// 	printf("0: %s", line);
-// 	line1 = get_next_line(fd1);
-// 	printf("1: %s", line1);
-// 	// while (line = get_next_line(fd))
-// 	// {
-// 	// 	printf("%s", line);
-// 	// 	free(line);
-// 	// }
-// }
-
-//0x116ada5c0
