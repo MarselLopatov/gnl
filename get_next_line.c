@@ -91,7 +91,7 @@ char	*get_line(char **cache, char **buf, char **line, int fd)
 		point_n = ft_strchr(*buf, '\n');
 		if (point_n)
 		{
-			*line = ft_strjoin (*line, *buf);
+			*line = ft_strjoin (*line, *buf); //проверить на утечку
 			point_n = ft_save_cache(++point_n);
 			ft_clear(cache, buf, line, 0);
 			*cache = point_n;
